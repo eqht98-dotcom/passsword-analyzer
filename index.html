@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>محلل قوة كلمة المرور</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <div class="container">
+
+    <!-- العنوان -->
+    <div class="header">
+      <div class="header-icon">🔐</div>
+      <h1>محلل قوة كلمة المرور</h1>
+      <p>اكتب كلمة مرور وسنحللها لك فوراً</p>
+    </div>
+
+    <!-- قسم الإدخال -->
+    <div class="input-section">
+      <div class="input-wrapper">
+        <input type="password" id="passwordInput" placeholder="اكتب كلمة المرور هنا..." autocomplete="off" />
+        <button class="toggle-btn" id="toggleBtn" onclick="togglePassword()">👁</button>
+      </div>
+
+      <!-- النوت المنبثق عند الكتابة -->
+      <div class="password-tooltip" id="passwordTooltip">
+        <p class="tooltip-title">كلمة المرور يجب أن تتضمن:</p>
+        <ul>
+          <li id="req-length">
+            <span class="req-icon">⭕</span> ثمانية أحرف على الأقل
+          </li>
+          <li id="req-upper">
+            <span class="req-icon">⭕</span> حرف كبير واحد على الأقل
+          </li>
+          <li id="req-lower">
+            <span class="req-icon">⭕</span> حرف صغير واحد على الأقل
+          </li>
+          <li id="req-number">
+            <span class="req-icon">⭕</span> رقم واحد على الأقل
+          </li>
+          <li id="req-special">
+            <span class="req-icon">⭕</span> رمز خاص واحد على الأقل (!@#$)
+          </li>
+        </ul>
+      </div>
+
+      <!-- بانر التسريب الفوري -->
+      <div id="leakedBanner" style="display:none;background:#7f1d1d;color:#fca5a5;border:1px solid #dc2626;border-radius:10px;padding:12px 16px;margin-bottom:10px;font-size:13px;gap:8px;align-items:center;line-height:1.5"></div>
+
+      <!-- شريط القوة -->
+      <div class="strength-bar-container">
+        <div class="strength-bar">
+          <div class="strength-fill" id="strengthFill"></div>
+        </div>
+        <span class="strength-label" id="strengthLabel">في انتظار كلمة المرور...</span>
+      </div>
+    </div>
+
+    <!-- بطاقات النتائج -->
+    <div class="results-grid">
+      <div class="result-card">
+        <div class="card-icon">⏱️</div>
+        <div class="card-title">وقت الاختراق</div>
+        <div class="card-value" id="crackTime">---</div>
+      </div>
+      <div class="result-card">
+        <div class="card-icon">💯</div>
+        <div class="card-title">درجة القوة</div>
+        <div class="card-value" id="scoreValue">---</div>
+      </div>
+      <div class="result-card">
+        <div class="card-icon">🔢</div>
+        <div class="card-title">مستوى التعقيد</div>
+        <div class="card-value" id="entropyValue">---</div>
+      </div>
+    </div>
+
+
+    <!-- التوصيات -->
+    <div class="suggestions-section">
+      <h3>💡 التوصيات</h3>
+      <div class="suggestions-list" id="suggestionsList">
+        <p class="placeholder-text">ابدأ بكتابة كلمة المرور لتظهر التوصيات...</p>
+      </div>
+    </div>
+
+    <!-- مولّد كلمة المرور -->
+    <div class="generator-section">
+      <h3>⚡ مولّد كلمة مرور قوية</h3>
+      <p class="gen-desc">اضغط الزر لتوليد كلمة مرور قوية جاهزة</p>
+      <div class="generator-options">
+        <label class="option-label"><input type="checkbox" id="gen-upper" checked /> أحرف كبيرة</label>
+        <label class="option-label"><input type="checkbox" id="gen-lower" checked /> أحرف صغيرة</label>
+        <label class="option-label"><input type="checkbox" id="gen-numbers" checked /> أرقام</label>
+        <label class="option-label"><input type="checkbox" id="gen-special" checked /> رموز</label>
+      </div>
+      <div class="generator-length">
+        <label>الطول: <span id="lengthValue">16</span> حرف</label>
+        <input type="range" id="lengthSlider" min="8" max="32" value="16" oninput="document.getElementById('lengthValue').textContent=this.value" />
+      </div>
+      <button class="generate-btn" onclick="generatePassword()">🎲 توليد كلمة مرور قوية</button>
+      <div class="generated-result" id="generatedResult" style="display:none">
+        <div class="generated-password" id="generatedPassword"></div>
+        <button class="copy-btn" onclick="copyPassword()">📋 نسخ</button>
+      </div>
+    </div>
+
+    <!-- فحص التسريب -->
+    <div class="generator-section" style="margin-top:0">
+      <h3>🔍 فحص التسريب العالمي</h3>
+      <p class="gen-desc">يفحص ضد 600 مليون كلمة مسرّبة — بدون إرسال كلمتك كاملة</p>
+      <button class="generate-btn" id="checkLeakBtn" onclick="checkLeaked()" style="background:linear-gradient(135deg,#7f1d1d,#991b1b)">🔍 فحص إذا كانت مسرّبة</button>
+      <div id="leakResult" style="margin-top:12px;font-size:14px;text-align:center;min-height:20px"></div>
+    </div>
+
+    <div class="footer">
+      <p>🔒 كلمات المرور لا تُرسل لأي خادم — كل شيء يعمل على جهازك فقط</p>
+    </div>
+
+  </div>
+
+  <script src="leaked-passwords.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
